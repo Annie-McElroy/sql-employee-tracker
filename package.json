@@ -1,0 +1,28 @@
+{
+  "name": "sql-employee-tracker",
+  "version": "1.0.0",
+  "description": "Employee database tracker using mysql",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Annie-McElroy/sql-employee-tracker.git"
+  },
+  "keywords": [
+    "mysql",
+    "inquirier"
+  ],
+  "author": "Annie McElroy",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Annie-McElroy/sql-employee-tracker/issues"
+  },
+  "homepage": "https://github.com/Annie-McElroy/sql-employee-tracker#readme",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "mysql2": "^2.2.5",
+    "inquirer": "^8.2.4"
+  }
+}
