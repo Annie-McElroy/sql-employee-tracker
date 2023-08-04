@@ -2,7 +2,7 @@
 const mysql = require('mysql2')
 require('dotenv').config();
 
-// Connection to SQL
+// Connection to SQL database
 const db = mysql.createConnection(
     // Database to connect (hidden by dotenv)
     process.env.DB_NAME,
