@@ -15,19 +15,22 @@ CREATE TABLE role (
     department_id INT,
     FOREIGN KEY (department_id)
     REFERENCES department(id)
-    ON DELETE SET NULL
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 CREATE TABLE employee (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(30),
     last_name VARCHAR(30),
     role_id INT,
     manager_id INT,
     FOREIGN KEY (role_id)
-    REFERENCES role(id)
-    ON DELETE SET NULL
+        REFERENCES role(id)
+        ON DELETE RESTRICT
+        ON UPDATE CASCADE,
     FOREIGN KEY (manager_id)
-    REFERENCES employee(id)
-    ON DELETE SET NULL
+        REFERENCES employee(id)
+        ON DELETE SET NULL
+        ON UPDATE CASCADE
 );
