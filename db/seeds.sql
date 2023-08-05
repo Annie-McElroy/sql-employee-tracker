@@ -3,7 +3,7 @@
 INSERT INTO department (name)
 VALUES
     ("Human Resources"),
-    ("Marketing")
+    ("Marketing"),
     ("Legal"),
     ("Engineering"),
     ("Sales");
