@@ -6,14 +6,22 @@ require('dotenv').config();
 const db = mysql.createConnection(
     {
         host: 'localhost',
-    // MySQL username (hidden by dotenv)
-    user: process.env.DB_USER,
-    // MySQL password (hidden by dotenv)
-    password: process.env.DB_PASSWORD,
-    // Database to connect (hidden by dotenv)
-    database: process.env.DB_NAME,
+        // MySQL username
+        user: process.env.DB_USER,
+        // MySQL password
+        password: process.env.DB_PASSWORD,
+        // Database to connect
+        database: process.env.DB_NAME,
     },
-    console.log(`Connected to the movies_db database.`)
 );
+    
+db.connect((err) => {
+    if (err) {
+        console.log(err);
+        return;
+    }
+    
+    console.log(`Connected to the employee_db database.`)
+})
 
 module.exports = db;
