@@ -4,6 +4,7 @@
 const inquirer = require('inquirer');
 const db = require('./connection.js');
 const mysql = require('mysql2');
+const { promptQuestions } = require('../index.js')
 
 
 // View All Department
@@ -40,7 +41,7 @@ const addNewDept = () => {
             promptQuestions();
         });
     })
-}
+};
 
 // Delete Department
 const deleteDept = () => {
@@ -272,15 +273,7 @@ const viewEmploybyDept = () => {
 
 // Add Employee
 const addEmployee = () => {
-    // Get a list of employees for manager pick
-    const employQuery = `SELECT * FROM employee`;
-    
-    db.query(employQuery, (err, result) => {
-        if (err) throw err;
-        const managers = result.map(({ first_name, last_name, id }) => ({ name: first_name + " " + last_name, value: id }));
-
-    // TODO: Get list of roles
-
+    // Question for name first
     inquirer.prompt([
         {
             type: "input",
@@ -292,28 +285,133 @@ const addEmployee = () => {
             name: "last_name",
             message: "What is the last name of the new employee?"
         },
-        {
-            // ROLE Question
-        }
     ])
     .then(answer => {
-        const query = `INSERT INTO department (name)
-        VALUES (?)`;
+        const params = [answer.first_name, answer.last_name]
         
-        db.query(query, answer.name, (err, result) => {
+        // Get a list of employees for manager pick
+        const employQuery = `SELECT * FROM employee`;
+        
+        db.query(employQuery, (err, result) => {
             if (err) throw err;
-            console.log(`Department ${answer.name} successfully added with id ${result.insertId}.`);
 
-            promptQuestions();
-        });
+            const managers = result.map(({ first_name, last_name, id }) => ({ name: first_name + " " + last_name, value: id }));
+
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "manager",
+                    messages: "Who is the employee's manager?",
+                    choices: managers
+                }
+                
+            ])
+            .then(response => {
+                const manager = response.managers;
+                params.push(manager);
+
+                // Get list of roles
+                const roleQuery = `SELECT * FROM role`;
+            
+                db.query(roleQuery, (err, result) => {
+                    if (err) throw err;
+
+                    const roles = result.map(({ title, id }) => ({ name: title, value: id }));
+
+                    inquirer.prompt([
+                        {
+                            type: "list",
+                            name: "role",
+                            message: "What is the employee's role?",
+                            choices: roles
+                        }
+                    ])
+                    .then(data => {
+                        const role = data.roles;
+                        params.push(role);
+
+                        const query = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                        VALUES (?, ?, ?, ?)`;
+                        
+                        db.query(query, answer.first_name, answer.last_name, answer.role, answer.manager, (err, result) => {
+                            if (err) throw err;
+                            console.log(`Employee has been added!`);
+                    
+                            promptQuestions();
+                        })
+                    })
+                })
+            })
+        })
     })
-}
+};
+
+
 
 // Delete Employee
 
 
 // Update Employee Role
+const updateEmployRole = () => {
+    const employeeQuery = `SELECT * FROM employee`;
 
+    db.query(employeeQuery, (err, result) => {
+        if (err) throw err;
+
+        const employees = result.map(({ id, first_name, last_name }) => ({ name: first_name + " " + last_name, value: id }));
+
+        inquirer.prompt([
+            {
+                type: "list",
+                name: "selected",
+                message: "Which employee would you like to update?",
+                choices: employees
+            }
+        ])
+        .then(answer => {
+            const employee = answer.selected;
+            const params = [];
+            params.push(employee);
+
+            const roleQuery = `SELECT * FROM role`;
+
+            db.query(roleQuery, (err, result) => {
+                if (err) throw err;
+
+                const roles = result.map(({ id, title }) => ({ name: title, value: id }))
+
+                inquirer.prompt([
+                    {
+                        type: "list",
+                        name: "role",
+                        message: "What is the employee's new role?"
+                    }
+                ])
+                .then(answer => {
+                    const role = answer.role;
+                    params.push(role);
+
+                    let employee = params[0]
+                    params[0] = role
+                    params[1] = employee
+                    
+                    const query = `UPDATE employee
+                    SET role_id = ?
+                    WHERE id = ?`;
+
+                    db.query(query, params, (err, result) => {
+                        if (err) throw err;
+                        console.log("Employee has been updated!")
+
+                        promptQuestions();
+                    })
+                })
+            })
+        })
+    })
+}
 
 // Update Employee Manager
 
+
+module.exports = { viewAllDept, addNewDept, deleteDept }
